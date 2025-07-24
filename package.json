@@ -6,11 +6,15 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/index.ts",
-    "start-v3": "ts-node src/index-v3.ts",
+    "start:dev": "XMTP_ENV=dev ts-node src/index.ts",
+    "start:prod": "XMTP_ENV=production ts-node src/index.ts",
+    "start:local": "XMTP_ENV=local ts-node src/index.ts",
     "send": "ts-node src/send.ts",
-    "send-v3": "ts-node src/send-v3.ts",
+    "send:dev": "XMTP_ENV=dev ts-node src/send.ts",
+    "send:prod": "XMTP_ENV=production ts-node src/send.ts",
     "receive": "ts-node src/receive.ts",
-    "receive-v3": "ts-node src/receive-v3.ts",
+    "receive:dev": "XMTP_ENV=dev ts-node src/receive.ts",
+    "receive:prod": "XMTP_ENV=production ts-node src/receive.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["xmtp", "blockchain", "messaging", "ethereum", "typescript"],

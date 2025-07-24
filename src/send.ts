@@ -1,4 +1,4 @@
-import { connectClientV3 } from './client'
+import { connectClientV3 } from './client';
 
 async function sendMessage() {
   try {
@@ -19,53 +19,101 @@ async function sendMessage() {
 
     // 连接XMTP V3客户端
     const client = await connectClientV3();
+    
+    console.log('您的 Inbox ID:', client.inboxId);
+    console.log('');
 
     try {
-      // V3: 尝试创建群组对话（因为findOrCreateDm不存在）
-      console.log('正在创建群组对话...');
-      const conversation = await (client.conversations as any).createGroup([recipientAddress]);
-      console.log('群组对话已创建，对话ID:', (conversation as any).id);
+      // V3: 首先尝试创建群组（1对1也是群组）
+      console.log('正在创建1对1群组对话...');
+      
+      // 检查是否可以创建群组
+      const group = await (client as any).conversations.createGroup([recipientAddress], {
+        name: `Chat with ${recipientAddress.slice(0, 8)}...`,
+        description: "Direct message conversation"
+      });
+      
+      console.log('✅ 群组创建成功!');
+      console.log('群组ID:', group.id);
 
-      // V3: 发送消息
-      await conversation.send(messageContent);
+      // 发送消息
+      await group.send(messageContent);
       
       console.log('✅ 消息发送成功!');
       console.log('发送时间:', new Date().toLocaleString());
-
-    } catch (groupError) {
-      console.warn('⚠️  群组创建失败，尝试其他方法...');
       
+    } catch (groupError) {
+      console.warn('⚠️  群组创建方式失败，尝试其他方法...');
+      console.log('错误详情:', groupError);
+      
+      // 备选方案：查找与指定地址的现有对话
       try {
-        // 备选方案：查找现有对话
-        console.log('正在查找现有对话...');
+        console.log('正在查找与指定地址的现有对话...');
+        
+        // 获取现有对话
         const conversations = await client.conversations.list();
+        console.log(`找到 ${conversations.length} 个现有对话`);
         
         let targetConversation: any = null;
+        
+        // 查找匹配的对话
         for (const conversation of conversations) {
-          if ((conversation as any).members && (conversation as any).members.length === 2) {
-            const otherMember = (conversation as any).members.find((member: any) => 
-              member.inboxId !== client.inboxId
-            );
-            if (otherMember && (
-              otherMember.inboxId === recipientAddress || 
-              (otherMember.addresses && otherMember.addresses.includes(recipientAddress))
-            )) {
-              targetConversation = conversation;
-              break;
+          try {
+            // 获取对话成员
+            const members = (conversation as any).members || [];
+            console.log(`检查对话 ${(conversation as any).id}，成员数: ${members.length}`);
+            
+            // 查找是否包含目标接收者
+            for (const member of members) {
+              const memberInboxId = member.inboxId;
+              const memberAddresses = member.addresses || [];
+              
+              console.log(`检查成员: ${memberInboxId}`);
+              console.log(`成员地址: ${memberAddresses.join(', ')}`);
+              
+              // 匹配 Inbox ID 或地址
+              if (memberInboxId === recipientAddress || 
+                  memberAddresses.includes(recipientAddress.toLowerCase()) ||
+                  memberAddresses.includes(recipientAddress)) {
+                
+                // 确保不是自己
+                if (memberInboxId !== client.inboxId) {
+                  targetConversation = conversation;
+                  console.log(`✅ 找到匹配的对话: ${(conversation as any).id}`);
+                  break;
+                }
+              }
             }
+            
+            if (targetConversation) break;
+            
+          } catch (memberError) {
+            console.log(`检查对话成员时出错: ${memberError}`);
+            continue;
           }
         }
         
         if (targetConversation) {
+          console.log('正在向找到的对话发送消息...');
           await targetConversation.send(messageContent);
-          console.log('✅ 消息发送成功（使用现有对话）!');
+          console.log('✅ 使用现有对话发送成功!');
         } else {
-          console.error('❌ 未找到与该地址的对话');
-          console.log('💡 提示：该地址可能还没有启用XMTP，或者需要先建立对话');
+          console.log('❌ 未找到与该地址的对话');
+          console.log('');
+          console.log('💡 解决建议：');
+          console.log('1. 请确保接收者已经启用了XMTP V3');
+          console.log('2. 接收者需要先向您发送一条消息来建立对话');
+          console.log('3. 检查接收者地址格式是否正确');
+          console.log(`4. 分享您的 Inbox ID 给接收者: ${client.inboxId}`);
+          console.log('5. 或者请接收者分享他们的 Inbox ID 给您');
         }
         
       } catch (fallbackError) {
-        console.error('❌ 所有发送方法都失败了:', fallbackError);
+        console.error('❌ 查找对话失败');
+        console.log('');
+        console.log('🔍 调试信息：');
+        console.log('群组错误:', (groupError as any)?.message || groupError);
+        console.log('查找错误:', (fallbackError as any)?.message || fallbackError);
       }
     }
 
