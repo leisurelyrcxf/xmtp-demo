@@ -1,0 +1,27 @@
+{
+  "name": "xmtp",
+  "version": "1.0.0",
+  "description": "XMTP PoC项目 - 基于Node.js和TypeScript的XMTP客户端示例",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "send": "ts-node src/send.ts",
+    "receive": "ts-node src/receive.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["xmtp", "blockchain", "messaging", "ethereum", "typescript"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@xmtp/xmtp-js": "^13.0.4",
+    "dotenv": "^16.3.2",
+    "ethers": "^6.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
