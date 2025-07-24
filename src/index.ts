@@ -1,4 +1,4 @@
-import { connectClient } from './client';
+import { connectClientV3 } from './client';
 
 async function main() {
   try {
@@ -6,9 +6,9 @@ async function main() {
     console.log('');
     
     // 连接XMTP客户端
-    const client = await connectClient();
+    const client = await connectClientV3();
     
-    console.log('客户端地址:', client.address);
+    console.log('Inbox ID:', client.inboxId);
     console.log('');
     console.log('✅ XMTP客户端初始化成功!');
     console.log('');
