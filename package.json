@@ -6,8 +6,11 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/index.ts",
+    "start-v3": "ts-node src/index-v3.ts",
     "send": "ts-node src/send.ts",
+    "send-v3": "ts-node src/send-v3.ts",
     "receive": "ts-node src/receive.ts",
+    "receive-v3": "ts-node src/receive-v3.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": ["xmtp", "blockchain", "messaging", "ethereum", "typescript"],
@@ -15,7 +18,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@xmtp/xmtp-js": "^13.0.4",
+    "@xmtp/node-sdk": "^3.2.0",
     "dotenv": "^16.3.2",
     "ethers": "^6.10.0"
   },
