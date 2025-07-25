@@ -20,7 +20,7 @@ async function checkCanMessage(client: Client, identifier: Identifier): Promise<
     if (canReach) {
       console.log('✅ 目标地址可达，可以发送消息');
     } else {
-      console.log('❌ 目标地址不可达，可能未启用XMTP');
+      console.log('❌ 目标地址不可达，可能未启用XMTP, response: ', response);
     }
     
     return !!canReach;    
