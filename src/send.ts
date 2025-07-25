@@ -86,8 +86,11 @@ async function sendMessage() {
 
     const [recipientAddress, messageContent] = args;
     
+    // 规范化地址格式（转换为小写）
+    const normalizedAddress = recipientAddress.toLowerCase();
+    
     console.log('=== XMTP DM 消息发送 ===');
-    console.log('接收者:', recipientAddress);
+    console.log('接收者:', normalizedAddress);
     console.log('消息内容:', messageContent);
     console.log('');
 
@@ -98,7 +101,7 @@ async function sendMessage() {
     console.log('');
 
     const identifier = {
-      identifier: recipientAddress,
+      identifier: normalizedAddress,
       identifierKind: IdentifierKind.Ethereum
     };
 
@@ -154,8 +157,8 @@ async function sendMessage() {
               );
               
               if (otherMember && (
-                otherMember.inboxId === recipientAddress ||
-                (otherMember.addresses && otherMember.addresses.includes(recipientAddress))
+                otherMember.inboxId === normalizedAddress ||
+                (otherMember.addresses && otherMember.addresses.includes(normalizedAddress))
               )) {
                 targetConversation = conversation;
                 console.log(`✅ 找到匹配的对话: ${conversation.id}`);
